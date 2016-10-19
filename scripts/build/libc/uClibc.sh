@@ -231,7 +231,7 @@ do_libc_backend_once() {
         # - "make install" calls install_runtime and install_dev
         # - so we're left with re-installing the headers... Sigh...
         CT_DoLog EXTRA "Installing C library"
-        CT_DoExecLog ALL ${make} "${make_args[@]}" install
+        CT_DoExecLog ALL ${make} "${make_args[@]}" install install_utils
     fi # libc_mode == final
 
     # Now, if installing headers into a subdirectory, put everything in its place.
@@ -276,6 +276,12 @@ manage_uClibc_config() {
         CT_KconfigEnableOption "ARCH_USE_MMU" "${dst}"
     else
         CT_KconfigDisableOption "ARCH_USE_MMU" "${dst}"
+    fi
+
+    if [ "${CT_SHARED_LIBS}" = "y" ]; then
+        CT_KconfigEnableOption "HAVE_SHARED" "${dst}"
+    else
+        CT_KconfigDisableOption "HAVE_SHARED" "${dst}"
     fi
 
     # Accomodate for old and new uClibc version, where the
@@ -370,6 +376,11 @@ manage_uClibc_config() {
     CT_KconfigDisableOption "UCLIBC_HAS_THREADS_NATIVE" "${dst}"
     case "${CT_THREADS}:${CT_LIBC_UCLIBC_LNXTHRD}" in
         none:)
+            ;;
+        linuxthreads:)
+            # Newer version of uClibc-ng, no old/new dichotomy
+            CT_KconfigEnableOption "UCLIBC_HAS_THREADS" "${dst}"
+            CT_KconfigEnableOption "UCLIBC_HAS_LINUXTHREADS" "${dst}"
             ;;
         linuxthreads:old)
             CT_KconfigEnableOption "UCLIBC_HAS_THREADS" "${dst}"
