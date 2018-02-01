@@ -68,9 +68,9 @@ choice
 # Don't remove next line
 # CT_INSERT_VERSION_BELOW
 
-config GDB_V_7_11
+config GDB_V_8_0_1
     bool
-    prompt "7.11"
+    prompt "8.0.1"
     select GDB_7_2_or_later
 
 config GDB_V_7_10_1
